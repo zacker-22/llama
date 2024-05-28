@@ -9,7 +9,7 @@ from phi.vectordb.pgvector import PgVector2
 from phi.storage.assistant.postgres import PgAssistantStorage
 import os
 
-db_url = SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL?sslmode=require').replace('postgres://', 'postgresql://')
+db_url = os.environ.get('DATABASE_URL?sslmode=require').replace('postgres://', 'postgresql://')
 def get_groq_assistant(
     llm_model: str = "llama3-70b-8192",
     embeddings_model: str = "text-embedding-3-small",
