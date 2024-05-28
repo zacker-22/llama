@@ -31,8 +31,6 @@ def restart_assistant():
 
 def main() -> None:
     # Get LLM model
-    reader = PDFReader()
-    rag_documents: List[Document] = reader.read("./2024 Catalog.pdf")
     llm_model = st.sidebar.selectbox("Select LLM", options=["llama3-70b-8192", "llama3-8b-8192", "mixtral-8x7b-32768"])
     # Set assistant_type in session state
     if "llm_model" not in st.session_state:
@@ -139,8 +137,8 @@ def main() -> None:
             alert = st.sidebar.info("Processing PDF...", icon="🧠")
             rag_name = uploaded_file.name.split(".")[0]
             if f"{rag_name}_uploaded" not in st.session_state:
-                
-                
+                reader = PDFReader()
+                rag_documents: List[Document] = reader.read(uploaded_file)
                 if rag_documents:
                     rag_assistant.knowledge_base.load_documents(rag_documents, upsert=True)
                 else:

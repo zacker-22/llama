@@ -9,7 +9,7 @@ from phi.vectordb.pgvector import PgVector2
 from phi.storage.assistant.postgres import PgAssistantStorage
 import os
 
-db_url = "postgresql+psycopg://dukcflrrqcadib:186d71ccf17f5ad688d797557a4dcfe40da5d3766b3c5753c1d4a69b71d2d7e4@ec2-54-144-112-84.compute-1.amazonaws.com:5432/dblnp73ibqrtjm"
+db_url = "postgresql+psycopg://u8e1i9mrojpgl3:pefb46a47a633e388f542712c7cdd0231632a10d52ef64cc611d47126f5f29aff@ce0lkuo944ch99.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d501jropnns2fl"
 def get_groq_assistant(
     llm_model: str = "llama3-70b-8192",
     embeddings_model: str = "text-embedding-3-small",
