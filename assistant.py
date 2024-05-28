@@ -9,7 +9,7 @@ from phi.vectordb.pgvector import PgVector2
 from phi.storage.assistant.postgres import PgAssistantStorage
 import os
 
-db_url = os.environ.get('DATABASE_URL?sslmode=require').replace('postgres://', 'postgresql://')
+db_url = "postgresql://dukcflrrqcadib:186d71ccf17f5ad688d797557a4dcfe40da5d3766b3c5753c1d4a69b71d2d7e4@ec2-54-144-112-84.compute-1.amazonaws.com:5432/dblnp73ibqrtjm"
 def get_groq_assistant(
     llm_model: str = "llama3-70b-8192",
     embeddings_model: str = "text-embedding-3-small",
