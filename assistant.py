@@ -7,6 +7,7 @@ from phi.embedder.openai import OpenAIEmbedder
 from phi.embedder.ollama import OllamaEmbedder
 from phi.vectordb.pgvector import PgVector2
 from phi.storage.assistant.postgres import PgAssistantStorage
+import os
 
 db_url = SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL?sslmode=require').replace('postgres://', 'postgresql://')
 def get_groq_assistant(
