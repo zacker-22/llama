@@ -8,8 +8,11 @@ from phi.embedder.ollama import OllamaEmbedder
 from phi.vectordb.pgvector import PgVector2
 from phi.storage.assistant.postgres import PgAssistantStorage
 import os
+from dotenv import load_dotenv
 
-db_url = "postgresql+psycopg://u8e1i9mrojpgl3:pefb46a47a633e388f542712c7cdd0231632a10d52ef64cc611d47126f5f29aff@ce0lkuo944ch99.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d501jropnns2fl"
+load_dotenv()
+
+db_url = os.getenv("MY_DB_URL")
 def get_groq_assistant(
     llm_model: str = "llama3-70b-8192",
     embeddings_model: str = "text-embedding-3-small",
@@ -43,22 +46,23 @@ def get_groq_assistant(
                 embedder=embedder,
             ),
             # 2 references are added to the prompt
-            num_documents=2,
+            num_documents=10,
         ),
-        description="You are an AI called 'GroqRAG' and your task is to answer questions using the provided information",
+        description="You are an AI called SFBUBot. You are here to help answer questions about the SFBU university.",
         instructions=[
             "When a user asks a question, you will be provided with information about the question.",
-            "Carefully read this information and provide a clear and concise answer to the user.",
-            "Do not use phrases like 'based on my knowledge' or 'depending on the information'.",
+            "Answer the question from context only.",
+            "Do not hallucinate or make up information. If you do not know the answer, say 'I don't know.'",
+            "Ask for clarification if you need more information to answer the question.",
         ],
         # This setting adds references from the knowledge_base to the user prompt
-        add_references_to_prompt=True,
+        add_references_to_prompt=False,
         # This setting tells the LLM to format messages in markdown
         markdown=True,
         # This setting adds chat history to the messages
         add_chat_history_to_messages=True,
         # This setting adds 4 previous messages from chat history to the messages
-        num_history_messages=4,
+        num_history_messages=100,
         add_datetime_to_instructions=True,
         debug_mode=debug_mode,
     )

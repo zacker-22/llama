@@ -6,12 +6,14 @@ from phi.document import Document
 from phi.document.reader.pdf import PDFReader
 from phi.document.reader.website import WebsiteReader
 from phi.utils.log import logger
-
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 from assistant import get_groq_assistant  # type: ignore
 
-os.environ["GROQ_API_KEY"] = "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"
+# os.environ["GROQ_API_KEY"] = "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"
 
 st.set_page_config(
     page_title="Lamma SFBU Chatbot",
@@ -49,7 +51,7 @@ def setUnloaded():
 def load(rag_assistant: Assistant):
     if not isLoaded():
         setLoaded()
-        reader = PDFReader()
+        reader = PDFReader(chunk=True, chunk_size=100000)
         rag_documents: List[Document] = reader.read("./2024Catalog.pdf")
         rag_assistant.knowledge_base.load_documents(rag_documents, upsert=True)
         
