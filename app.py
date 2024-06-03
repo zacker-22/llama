@@ -28,6 +28,32 @@ def restart_assistant():
         st.session_state["file_uploader_key"] += 1
     st.rerun()
 
+isLoaded = False
+import threading
+
+lock = threading.Lock()
+def isLoaded():
+    
+    with lock and open("done.txt", "r") as f:
+        return f.read().strip() == "done"
+
+def setLoaded():
+    with lock and open("done.txt", "w") as f:
+        f.write("done")
+
+def setUnloaded():
+    with lock and open("done.txt", "w") as f:
+        f.write("")
+
+
+def load(rag_assistant: Assistant):
+    if not isLoaded():
+        setLoaded()
+        reader = PDFReader()
+        rag_documents: List[Document] = reader.read("./2024Catalog.pdf")
+        rag_assistant.knowledge_base.load_documents(rag_documents, upsert=True)
+        
+
 
 def main() -> None:
     # Get LLM model
@@ -64,6 +90,8 @@ def main() -> None:
     else:
         rag_assistant = st.session_state["rag_assistant"]
 
+    load(rag_assistant)
+
     # Create assistant run (i.e. log to database) and save run_id in session state
     try:
         st.session_state["rag_assistant_run_id"] = rag_assistant.create_run()
@@ -72,12 +100,12 @@ def main() -> None:
         return
 
     # Load existing messages
+    
+    
     assistant_chat_history = rag_assistant.memory.get_chat_history()
     if len(assistant_chat_history) > 0:
-        logger.debug("Loading chat history")
         st.session_state["messages"] = assistant_chat_history
     else:
-        logger.debug("No chat history found")
         st.session_state["messages"] = [{"role": "assistant", "content": "Upload a doc and ask me questions..."}]
 
     # Prompt for user input
@@ -103,49 +131,10 @@ def main() -> None:
                 resp_container.markdown(response)
             st.session_state["messages"].append({"role": "assistant", "content": response})
 
-    # Load knowledge base
-    if rag_assistant.knowledge_base:
-        # -*- Add websites to knowledge base
-        if "url_scrape_key" not in st.session_state:
-            st.session_state["url_scrape_key"] = 0
+   
 
-        input_url = st.sidebar.text_input(
-            "Add URL to Knowledge Base", type="default", key=st.session_state["url_scrape_key"]
-        )
-        add_url_button = st.sidebar.button("Add URL")
-        if add_url_button:
-            if input_url is not None:
-                alert = st.sidebar.info("Processing URLs...", icon="ℹ️")
-                if f"{input_url}_scraped" not in st.session_state:
-                    scraper = WebsiteReader(max_links=2, max_depth=1)
-                    web_documents: List[Document] = scraper.read(input_url)
-                    if web_documents:
-                        rag_assistant.knowledge_base.load_documents(web_documents, upsert=True)
-                    else:
-                        st.sidebar.error("Could not read website")
-                    st.session_state[f"{input_url}_uploaded"] = True
-                alert.empty()
-
-        # Add PDFs to knowledge base
-        if "file_uploader_key" not in st.session_state:
-            st.session_state["file_uploader_key"] = 100
-
-        uploaded_file = st.sidebar.file_uploader(
-            "Add a PDF :page_facing_up:", type="pdf", key=st.session_state["file_uploader_key"]
-        )
-        if uploaded_file is not None:
-            alert = st.sidebar.info("Processing PDF...", icon="🧠")
-            rag_name = uploaded_file.name.split(".")[0]
-            if f"{rag_name}_uploaded" not in st.session_state:
-                reader = PDFReader()
-                rag_documents: List[Document] = reader.read(uploaded_file)
-                if rag_documents:
-                    rag_assistant.knowledge_base.load_documents(rag_documents, upsert=True)
-                else:
-                    st.sidebar.error("Could not read PDF")
-                st.session_state[f"{rag_name}_uploaded"] = True
-            alert.empty()
-
+        
+        
     if rag_assistant.knowledge_base and rag_assistant.knowledge_base.vector_db:
         if st.sidebar.button("Clear Knowledge Base"):
             rag_assistant.knowledge_base.vector_db.clear()
