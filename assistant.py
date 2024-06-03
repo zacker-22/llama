@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 db_url = os.getenv("MY_DB_URL")
+os.environ["DATABASE_URL"] = db_url
 def get_groq_assistant(
     llm_model: str = "llama3-70b-8192",
     embeddings_model: str = "text-embedding-3-small",
