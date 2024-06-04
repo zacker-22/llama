@@ -13,7 +13,6 @@ load_dotenv()
 
 from assistant import get_groq_assistant  # type: ignore
 
-# os.environ["GROQ_API_KEY"] = "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"
 
 st.set_page_config(
     page_title="Lamma SFBU Chatbot",
