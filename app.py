@@ -108,7 +108,7 @@ def main() -> None:
     if len(assistant_chat_history) > 0:
         st.session_state["messages"] = assistant_chat_history
     else:
-        st.session_state["messages"] = [{"role": "assistant", "content": "Upload a doc and ask me questions..."}]
+        st.session_state["messages"] = [{"role": "assistant", "content": "Ask me questions about the SFBU Catalog!"}]
 
     # Prompt for user input
     if prompt := st.chat_input():
