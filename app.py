@@ -92,6 +92,7 @@ def main() -> None:
         rag_assistant = st.session_state["rag_assistant"]
 
     load(rag_assistant)
+    # rag_assistant.knowledge_base.load(recreate=False, skip_existing=True)
 
     # Create assistant run (i.e. log to database) and save run_id in session state
     try:

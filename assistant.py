@@ -7,6 +7,9 @@ from phi.embedder.openai import OpenAIEmbedder
 from phi.embedder.ollama import OllamaEmbedder
 from phi.vectordb.pgvector import PgVector2
 from phi.storage.assistant.postgres import PgAssistantStorage
+from phi.knowledge.pdf import PDFUrlKnowledgeBase
+from phi.knowledge.text import TextKnowledgeBase
+from phi.knowledge.combined import CombinedKnowledgeBase
 import os
 from dotenv import load_dotenv
 
@@ -34,19 +37,45 @@ def get_groq_assistant(
         "groq_rag_documents_ollama" if embeddings_model == "nomic-embed-text" else "groq_rag_documents_openai"
     )
 
+    with open("links.txt") as f:
+        urls = [line.strip() for line in f.readlines() if line.startswith("http") and line.endswith("pdf")]
+    
+    pdf_knowledge_base=PDFUrlKnowledgeBase(
+            urls = urls,
+            vector_db=PgVector2(
+                db_url=db_url,
+                collection=embeddings_table,
+                embedder=embedder,
+            ),
+        )
+
+    
+    
+    text_knowledge_base = TextKnowledgeBase(
+        path="./docs",
+        vector_db=PgVector2(
+            db_url=db_url,
+            collection=embeddings_table,
+            embedder=embedder,
+        ),
+    )
+
     return Assistant(
         name="groq_rag_assistant",
         run_id=run_id,
         user_id=user_id,
         llm=Groq(model=llm_model),
         storage=PgAssistantStorage(table_name="groq_rag_assistant", db_url=db_url),
-        knowledge_base=AssistantKnowledge(
+        knowledge_base=CombinedKnowledgeBase(
+            sources=[
+                pdf_knowledge_base,
+                text_knowledge_base,
+            ],
             vector_db=PgVector2(
                 db_url=db_url,
                 collection=embeddings_table,
                 embedder=embedder,
             ),
-            # 2 references are added to the prompt
             num_documents=10,
         ),
         description="You are an AI called SFBUBot. You are here to help answer questions about the SFBU university.",
