@@ -16,12 +16,14 @@ def get_page(url):
     return unidecode.unidecode(html2text.html2text( requests.get(url).text ))
 
 
+def clean():
+    with open('docs/output.txt', 'r') as f:
+        lines = f.readlines()
+    s = set()
+    with open('docs/output.txt', 'w') as f:
+        for line in lines:
+            if line not in s:
+                f.write(line)
+                s.add(line)
 
-for i in get_links():
-    print(i)
-    if i.endswith('pdf'):
-        continue
-    with open('output.txt', 'a') as f:
-        f.write(get_page(i))
-        f.write('\n')
-
+clean()
