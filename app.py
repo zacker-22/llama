@@ -88,12 +88,13 @@ def main() -> None:
         logger.info(f"---*--- Creating {llm_model} Assistant ---*---")
         rag_assistant = get_groq_assistant(llm_model=llm_model, embeddings_model=embeddings_model)
         st.session_state["rag_assistant"] = rag_assistant
+        rag_assistant.knowledge_base.load()
+
     else:
         rag_assistant = st.session_state["rag_assistant"]
 
     load(rag_assistant)
-    rag_assistant.knowledge_base.load(recreate=False, skip_existing=True)
-
+    
     # Create assistant run (i.e. log to database) and save run_id in session state
     try:
         st.session_state["rag_assistant_run_id"] = rag_assistant.create_run()
